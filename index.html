@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Harvest Vehicle Booking</title>
     <style>
-        /* Animated Gradient Background */
+        /* Background Animation */
         @keyframes gradientAnimation {
             0% { background-position: 0% 50%; }
             50% { background-position: 100% 50%; }
@@ -28,7 +28,7 @@
         }
 
         .container {
-            max-width: 600px;
+            max-width: 400px;
             background: white;
             padding: 20px;
             border-radius: 12px;
@@ -46,32 +46,34 @@
             font-size: 24px;
         }
 
-        .btn {
+        label {
             display: block;
+            text-align: left;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        input, button {
             width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+        }
+
+        button {
             background: #2a5298;
             color: white;
             border: none;
-            padding: 14px;
             font-size: 16px;
-            border-radius: 6px;
             cursor: pointer;
-            text-decoration: none;
             font-weight: bold;
             transition: 0.3s ease-in-out;
-            margin-bottom: 20px;
         }
 
-        .btn:hover {
+        button:hover {
             background: #1e3c72;
             transform: translateY(-2px);
-        }
-
-        iframe {
-            width: 100%;
-            height: 900px;
-            border: none;
-            margin-top: 10px;
         }
     </style>
 </head>
@@ -79,17 +81,53 @@
 
     <div class="container">
         <h2>Harvest Vehicle Booking</h2>
-        <p>Click below to pay ₹500 via UPI:</p>
-        <button class="btn" onclick="redirectToUPI()">Pay via UPI</button>
+        <form id="bookingForm">
+            <label for="name">Full Name</label>
+            <input type="text" id="name" name="name" required>
 
-        <h3>Fill the Form Below with UPI Reference Number</h3>
-        <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSfefNuj6wxFMtGMOzaTW05DhUqLQFSZW7psKA-4AJc1de5L0A/viewform?embedded=true"></iframe>
+            <label for="email">Email Address</label>
+            <input type="email" id="email" name="email" required>
+
+            <label for="phone">Phone Number</label>
+            <input type="tel" id="phone" name="phone" required>
+
+            <label for="upi">UPI Reference Number</label>
+            <input type="text" id="upi" name="upi" required>
+
+            <button type="button" onclick="submitForm()">Submit Booking</button>
+        </form>
     </div>
 
     <script>
-        function redirectToUPI() {
-            alert("Redirecting to UPI. Please complete your payment.");
-            window.location.href = "upi://pay?pa=7010686652@pytes&pn=Harvest%20Vehicle&mc=0000&tid=123456789&tr=ORDER123&tn=Harvest%20Vehicle%20Booking&am=500&cu=INR";
+        function submitForm() {
+            var name = document.getElementById("name").value;
+            var email = document.getElementById("email").value;
+            var phone = document.getElementById("phone").value;
+            var upi = document.getElementById("upi").value;
+
+            if (!name || !email || !phone || !upi) {
+                alert("Please fill in all fields.");
+                return;
+            }
+
+            var formData = {
+                name: name,
+                email: email,
+                phone: phone,
+                upi: upi
+            };
+
+            fetch("https://script.google.com/macros/s/AKfycbxU3GZe9GcetmS-k2tFxe6dYaybUzdjdAunrfNws3F86eXkz0uFUE0G_rdGD3k8XruXgw/exec", {
+                method: "POST",
+                mode: "no-cors",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(formData)
+            })
+            .then(() => {
+                alert("Booking submitted successfully! A confirmation email has been sent.");
+                document.getElementById("bookingForm").reset();
+            })
+            .catch(error => console.error("Error:", error));
         }
     </script>
 
