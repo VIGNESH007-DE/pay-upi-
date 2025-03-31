@@ -5,54 +5,29 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Harvest Vehicle Booking</title>
     <style>
-        /* Background Animation */
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(45deg, #1e3c72, #2a5298, #6dd5ed, #2193b0);
+            background-size: 300% 300%;
+            animation: gradientAnimation 8s ease infinite;
+        }
         @keyframes gradientAnimation {
             0% { background-position: 0% 50%; }
             50% { background-position: 100% 50%; }
             100% { background-position: 0% 50%; }
         }
-
-        body {
-            font-family: 'Arial', sans-serif;
-            text-align: center;
-            margin: 0;
-            padding: 0;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            background: linear-gradient(45deg, #1e3c72, #2a5298, #6dd5ed, #2193b0);
-            background-size: 300% 300%;
-            animation: gradientAnimation 8s ease infinite;
-        }
-
         .container {
             max-width: 400px;
             background: white;
             padding: 20px;
             border-radius: 12px;
             box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2);
-            animation: fadeIn 1s ease-in-out;
         }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        h2 {
-            color: #2c3e50;
-            font-size: 24px;
-        }
-
-        label {
-            display: block;
-            text-align: left;
-            margin-bottom: 5px;
-            font-weight: bold;
-        }
-
+        h2 { color: #2c3e50; font-size: 24px; }
+        label { display: block; text-align: left; margin-bottom: 5px; font-weight: bold; }
         input, button {
             width: 100%;
             padding: 10px;
@@ -60,7 +35,6 @@
             border: 1px solid #ccc;
             border-radius: 6px;
         }
-
         button {
             background: #2a5298;
             color: white;
@@ -70,10 +44,10 @@
             font-weight: bold;
             transition: 0.3s ease-in-out;
         }
-
-        button:hover {
-            background: #1e3c72;
-            transform: translateY(-2px);
+        button:hover { background: #1e3c72; transform: translateY(-2px); }
+        .upi-button {
+            background: #28a745;
+            margin-bottom: 10px;
         }
     </style>
 </head>
@@ -91,6 +65,8 @@
             <label for="phone">Phone Number</label>
             <input type="tel" id="phone" name="phone" required>
 
+            <button type="button" class="upi-button" onclick="payNow()">Pay Now (UPI)</button>
+
             <label for="upi">UPI Reference Number</label>
             <input type="text" id="upi" name="upi" required>
 
@@ -99,6 +75,11 @@
     </div>
 
     <script>
+        function payNow() {
+            // Redirect to UPI payment with prefilled details
+            window.location.href = "upi://pay?pa=7010686652@pytes&pn=HarvestVehicle&tn=HarvestVehicleBooking&cu=INR";
+        }
+
         function submitForm() {
             var name = document.getElementById("name").value;
             var email = document.getElementById("email").value;
@@ -110,24 +91,32 @@
                 return;
             }
 
-            var formData = {
-                name: name,
-                email: email,
-                phone: phone,
-                upi: upi
-            };
+            var formData = new FormData();
+            formData.append("entry.1322492702", name);  // Name Entry ID
+            formData.append("entry.1524434294", email); // Email Entry ID
+            formData.append("entry.1775378023", phone); // Phone Entry ID
+            formData.append("entry.1340001263", upi);   // UPI Entry ID
 
-            fetch("https://script.google.com/macros/s/AKfycbxU3GZe9GcetmS-k2tFxe6dYaybUzdjdAunrfNws3F86eXkz0uFUE0G_rdGD3k8XruXgw/exec", {
+            fetch("https://docs.google.com/forms/d/e/1FAIpQLSfefNuj6wxFMtGMOzaTW05DhUqLQFSZW7psKA-4AJc1de5L0A/formResponse", {
                 method: "POST",
-                mode: "no-cors",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(formData)
+                body: formData,
+                mode: "no-cors"
             })
             .then(() => {
+                sendEmail(name, email, phone, upi);
                 alert("Booking submitted successfully! A confirmation email has been sent.");
                 document.getElementById("bookingForm").reset();
             })
             .catch(error => console.error("Error:", error));
+        }
+
+        function sendEmail(name, email, phone, upi) {
+            fetch("https://script.google.com/macros/s/AKfycbxOHBMJYVMIZ9w7iKQ2RSAIaCc6ASzecBtvaOga6lHBCkPH--MNpi8StzSIFUDWvvZXig/exec", {
+                method: "POST",
+                mode: "no-cors",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ name, email, phone, upi })
+            });
         }
     </script>
 
