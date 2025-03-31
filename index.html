@@ -68,6 +68,9 @@
 
             <label for="phone">Phone Number</label>
             <input type="tel" id="phone" name="phone" required>
+            
+            <label for="address">Address</label>
+            <input type="text" id="address" name="address" required>
 
             <button type="button" class="upi-button" onclick="payNow()">Pay Now (UPI)</button>
 
@@ -88,18 +91,20 @@
             var name = document.getElementById("name").value;
             var email = document.getElementById("email").value;
             var phone = document.getElementById("phone").value;
+            var address = document.getElementById("address").value;
             var upi = document.getElementById("upi").value;
 
-            if (!name || !email || !phone || !upi) {
+            if (!name || !email || !phone || !address || !upi) {
                 alert("Please fill in all fields.");
                 return;
             }
 
             var formData = new FormData();
-            formData.append("entry.1322492702", name);
-            formData.append("entry.1524434294", email);
-            formData.append("entry.1775378023", phone);
-            formData.append("entry.1340001263", upi);
+            formData.append("entry.1322492702", name);  // Name Entry ID
+            formData.append("entry.1524434294", email); // Email Entry ID
+            formData.append("entry.1775378023", phone); // Phone Entry ID
+            formData.append("entry.1987654321", address); // Address Entry ID
+            formData.append("entry.1340001263", upi);   // UPI Entry ID
 
             fetch("https://docs.google.com/forms/d/e/1FAIpQLSfefNuj6wxFMtGMOzaTW05DhUqLQFSZW7psKA-4AJc1de5L0A/formResponse", {
                 method: "POST",
@@ -107,20 +112,19 @@
                 mode: "no-cors"
             })
             .then(() => {
-                return sendEmail(name, email, phone, upi);
-            })
-            .then(() => {
+                sendEmail(name, email, phone, address, upi);
                 alert("Booking submitted successfully! A confirmation email has been sent.");
                 document.getElementById("bookingForm").reset();
             })
             .catch(error => console.error("Error:", error));
         }
 
-        function sendEmail(name, email, phone, upi) {
-            return fetch("https://script.google.com/macros/s/AKfycbxKZot-xagiUzfjwAX3VdZyxx41xBfDOfVLYuZM93EiHsqHECGpq7UAfBKhjMhJkx07Fg/exec", {
+        function sendEmail(name, email, phone, address, upi) {
+            fetch("https://script.google.com/macros/s/AKfycbxKZot-xagiUzfjwAX3VdZyxx41xBfDOfVLYuZM93EiHsqHECGpq7UAfBKhjMhJkx07Fg/exec", {
                 method: "POST",
+                mode: "no-cors",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ name, email, phone, upi })
+                body: JSON.stringify({ name, email, phone, address, upi })
             });
         }
     </script>
