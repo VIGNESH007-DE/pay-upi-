@@ -5,13 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Harvest Vehicle Payment</title>
     <style>
-        /* Animated Gradient Background */
-        @keyframes gradientAnimation {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
         body {
             font-family: 'Arial', sans-serif;
             text-align: center;
@@ -25,32 +18,16 @@
             background-size: 300% 300%;
             animation: gradientAnimation 8s ease infinite;
         }
-
         .container {
             max-width: 400px;
             background: white;
             padding: 25px;
             border-radius: 12px;
             box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2);
-            animation: fadeIn 1s ease-in-out;
         }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
         h2 {
             color: #2c3e50;
-            font-size: 24px;
         }
-
-        p {
-            font-size: 16px;
-            color: #555;
-            margin-bottom: 20px;
-        }
-
         .btn {
             display: block;
             width: 100%;
@@ -61,25 +38,12 @@
             font-size: 16px;
             border-radius: 6px;
             cursor: pointer;
-            text-decoration: none;
-            font-weight: bold;
             transition: 0.3s ease-in-out;
         }
-
         .btn:hover {
             background: #1e3c72;
             transform: translateY(-2px);
         }
-
-        .whatsapp-btn {
-            background: #25d366;
-            margin-top: 12px;
-        }
-
-        .whatsapp-btn:hover {
-            background: #1ebc58;
-        }
-
         input, textarea {
             width: 100%;
             padding: 10px;
@@ -87,11 +51,9 @@
             border: 1px solid #ccc;
             border-radius: 6px;
         }
-
         input[type="file"] {
             border: none;
         }
-
     </style>
 </head>
 <body>
@@ -99,15 +61,15 @@
     <div class="container">
         <h2>Harvest Vehicle Booking</h2>
         <p>Click below to pay ₹500 via UPI:</p>
-
         <button class="btn" onclick="redirectToUPI()">Pay via UPI</button>
 
         <h3>Upload Payment Screenshot</h3>
         <form id="paymentForm">
             <input type="text" id="name" placeholder="Your Name" required>
             <textarea id="address" placeholder="Your Address" required></textarea>
-            <input type="file" id="screenshot" accept="image/*" required>
             <input type="tel" id="whatsappNumber" placeholder="Your WhatsApp Number" required>
+            <input type="email" id="email" placeholder="Your Email" required>
+            <input type="file" id="screenshot" accept="image/*" required>
             <button type="submit" class="btn">Submit</button>
         </form>
     </div>
@@ -115,38 +77,30 @@
     <script>
         function redirectToUPI() {
             alert("Redirecting to UPI. Please complete your payment.");
-            window.location.href = "upi://pay?pa=7010686652@pytes&pn=Harvest%20Vehicle&mc=0000&tid=123456789&tr=ORDER123&tn=Harvest%20Vehicle%20Booking&am=500&cu=INR";
+            window.location.href = "upi://pay?pa=7010686652@ybl&pn=Harvest%20Vehicle&mc=0000&tid=123456789&tr=ORDER123&tn=Harvest%20Vehicle%20Booking&am=500&cu=INR";
         }
 
-        document.getElementById("paymentForm").addEventListener("submit", function(event) {
+        document.getElementById("paymentForm").addEventListener("submit", async function (event) {
             event.preventDefault();
 
-            let name = document.getElementById("name").value;
-            let address = document.getElementById("address").value;
-            let screenshot = document.getElementById("screenshot").files[0];
-            let whatsappNumber = document.getElementById("whatsappNumber").value;
+            let formData = new FormData();
+            formData.append("name", document.getElementById("name").value);
+            formData.append("address", document.getElementById("address").value);
+            formData.append("whatsappNumber", document.getElementById("whatsappNumber").value);
+            formData.append("email", document.getElementById("email").value);
+            formData.append("screenshot", document.getElementById("screenshot").files[0]);
 
-            if (!screenshot) {
-                alert("Please upload your payment screenshot.");
-                return;
+            try {
+                let response = await fetch("https://script.google.com/macros/s/AKfycbxKZot-xagiUzfjwAX3VdZyxx41xBfDOfVLYuZM93EiHsqHECGpq7UAfBKhjMhJkx07Fg/exec", { // Replace with your Web App URL
+                    method: "POST",
+                    body: formData
+                });
+
+                let result = await response.text();
+                alert(result);
+            } catch (error) {
+                alert("Error processing your request");
             }
-
-            let reader = new FileReader();
-            reader.readAsDataURL(screenshot);
-            reader.onload = function () {
-                let imageUrl = reader.result; // This is a base64 image. Backend needed for storage.
-
-                let message = `I've paid ₹500 for Harvest Vehicle.\n\nName: ${name}\nAddress: ${address}\n\nHere is my payment screenshot: (Upload the image manually)`;
-                let whatsappUrl = `https://wa.me/7010686652?text=${encodeURIComponent(message)}`;
-
-                alert("Redirecting to WhatsApp. Please upload your screenshot manually.");
-                window.open(whatsappUrl, "_blank");
-
-                // Send WhatsApp Receipt
-                let receiptMessage = `Payment received!\n\nThank you, ${name}.\nYour booking for the Harvest Vehicle has been confirmed.\n\nAddress: ${address}\nAmount Paid: ₹500\n\nWe will contact you soon!`;
-                let userWhatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(receiptMessage)}`;
-                window.open(userWhatsappUrl, "_blank");
-            };
         });
     </script>
 
