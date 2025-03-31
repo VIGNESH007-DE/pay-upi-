@@ -13,6 +13,10 @@
             background: linear-gradient(45deg, #1e3c72, #2a5298, #6dd5ed, #2193b0);
             background-size: 300% 300%;
             animation: gradientAnimation 8s ease infinite;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
         }
         @keyframes gradientAnimation {
             0% { background-position: 0% 50%; }
@@ -92,10 +96,10 @@
             }
 
             var formData = new FormData();
-            formData.append("entry.1322492702", name);  // Name Entry ID
-            formData.append("entry.1524434294", email); // Email Entry ID
-            formData.append("entry.1775378023", phone); // Phone Entry ID
-            formData.append("entry.1340001263", upi);   // UPI Entry ID
+            formData.append("entry.1322492702", name);
+            formData.append("entry.1524434294", email);
+            formData.append("entry.1775378023", phone);
+            formData.append("entry.1340001263", upi);
 
             fetch("https://docs.google.com/forms/d/e/1FAIpQLSfefNuj6wxFMtGMOzaTW05DhUqLQFSZW7psKA-4AJc1de5L0A/formResponse", {
                 method: "POST",
@@ -103,7 +107,9 @@
                 mode: "no-cors"
             })
             .then(() => {
-                sendEmail(name, email, phone, upi);
+                return sendEmail(name, email, phone, upi);
+            })
+            .then(() => {
                 alert("Booking submitted successfully! A confirmation email has been sent.");
                 document.getElementById("bookingForm").reset();
             })
@@ -111,9 +117,8 @@
         }
 
         function sendEmail(name, email, phone, upi) {
-            fetch("https://script.google.com/macros/s/AKfycbxOHBMJYVMIZ9w7iKQ2RSAIaCc6ASzecBtvaOga6lHBCkPH--MNpi8StzSIFUDWvvZXig/exec", {
+            return fetch("https://script.google.com/macros/s/AKfycbxKZot-xagiUzfjwAX3VdZyxx41xBfDOfVLYuZM93EiHsqHECGpq7UAfBKhjMhJkx07Fg/exec", {
                 method: "POST",
-                mode: "no-cors",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ name, email, phone, upi })
             });
